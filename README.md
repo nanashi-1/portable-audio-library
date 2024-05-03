@@ -15,7 +15,7 @@ A portable audio library file format.
 Builders are a group functions that converts a certain audio library format into Portable Audio Library and vice versa.
 
 - [x] Directory Audio Library
-- [ ] M3U
+- [x] M3U
 - [ ] PLS
 - [ ] XSPF
 
