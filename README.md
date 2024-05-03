@@ -2,7 +2,7 @@
 
 [![Clippy](https://github.com/nanashi-1/portable-audio-library/actions/workflows/check.yml/badge.svg)](https://github.com/nanashi-1/portable-audio-library/actions/workflows/check.yml)
 [![Crates.io](https://img.shields.io/crates/v/portable-audio-library.svg)](https://crates.io/crates/portable-audio-library)
-[![Rustdoc](https://img.shields.io/badge/doc-rustdoc-green.svg)](https://docs.rs/portable-audio-library/0.1.0/portable_audio_library)
+[![Rustdoc](https://img.shields.io/badge/doc-rustdoc-green.svg)](https://docs.rs/portable-audio-library/latest/portable_audio_library)
 
 > [!NOTE]
 > This project is still in alpha.
