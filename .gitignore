@@ -1,2 +1,3 @@
 /target
 /doc-tests/out-library
+Cargo.lock
