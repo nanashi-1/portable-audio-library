@@ -1,6 +1,6 @@
 use clap::{Parser, Subcommand, ValueEnum};
 use portable_audio_library::{
-    builder::directory::{self},
+    builder::{directory, m3u},
     compression,
     error::PortableAudioLibraryResult,
     serialization::Metadata,
@@ -70,6 +70,7 @@ enum Subcommands {
 enum BuilderType {
     #[default]
     Directory,
+    M3U,
 }
 
 #[derive(ValueEnum, Clone)]
@@ -108,6 +109,12 @@ fn main() -> PortableAudioLibraryResult<()> {
 
                 metadata.write_to_file(output)?;
             }
+            BuilderType::M3U => {
+                let mut metadata = m3u::build_metadata_from_m3u(input)?;
+                metadata.compression_type = compression_type.into(*compression_level);
+
+                metadata.write_to_file(output)?;
+            }
         },
         Subcommands::Decode {
             input,
@@ -120,6 +127,9 @@ fn main() -> PortableAudioLibraryResult<()> {
             match builder {
                 BuilderType::Directory => {
                     directory::build_directory_from_metadata(output, &metadata)?;
+                }
+                BuilderType::M3U => {
+                    m3u::build_m3u_from_metadata(output, &metadata)?;
                 }
             }
         }
