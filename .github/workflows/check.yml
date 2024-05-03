@@ -2,21 +2,18 @@ name: Rust
 
 on:
   push:
-    branches: [ "master" ]
+    branches: ["master"]
   pull_request:
-    branches: [ "master" ]
+    branches: ["master"]
 
 env:
-  CARGO_TERM_COLOR: always
+  RUSTFLAGS: -D warnings
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v4
-    - name: Check
-      run: cargo check
-    - name: Clippy
-      run: cargo clippy
+      - uses: actions/checkout@v4
+      - name: Clippy
+        run: cargo clippy
