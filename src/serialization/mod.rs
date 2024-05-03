@@ -9,6 +9,7 @@ use std::{
     path::PathBuf,
 };
 
+/// Playlist name.
 pub type Playlist = String;
 
 const U64_SIZE: usize = std::mem::size_of::<u64>();
@@ -16,6 +17,7 @@ const PROGRESS_BAR_TEMPLATE: &str = "{spinner:.green} {msg} [{wide_bar}] {pos}/{
 const PROGRESS_CHARS: &str = "=> ";
 const CHECK_GREEN: &str = "\x1b[32m✓\x1b[0m";
 
+/// Metadata of audio library.
 #[derive(Debug, Clone, Default, PartialEq, PartialOrd, Serialize, Deserialize)]
 pub struct Metadata {
     pub name: String,
@@ -23,6 +25,7 @@ pub struct Metadata {
     pub audios: Vec<AudioMetadata>,
 }
 
+/// Metadata of audio.
 #[derive(Debug, Clone, PartialEq, PartialOrd, Serialize, Deserialize)]
 pub struct AudioMetadata {
     pub name: String,
@@ -34,8 +37,7 @@ pub struct AudioMetadata {
 }
 
 impl Metadata {
-    /// Write metadata and audios to a file.
-    /// File structure: `metadata_length -> metadata -> audios`
+    /// Writes the metadata to the file.
     pub fn write_to_file(&mut self, path: impl Into<PathBuf>) -> PortableAudioLibraryResult<()> {
         let path = path.into();
 
@@ -93,6 +95,7 @@ impl Metadata {
         Ok(())
     }
 
+    /// Reads the metadata from the file.
     pub fn read_from_file(
         path: impl Into<PathBuf>,
         directory_store: impl Into<PathBuf>,

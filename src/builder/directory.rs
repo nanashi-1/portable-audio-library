@@ -10,6 +10,7 @@ use std::{
 
 const ROOT: &str = "root";
 
+/// Builds a [`Metadata`] from a directory.
 pub fn build_metadata_from_directory(
     path: impl Into<PathBuf>,
 ) -> PortableAudioLibraryResult<Metadata> {
@@ -45,6 +46,7 @@ pub fn build_metadata_from_directory(
     Ok(metadata)
 }
 
+/// Builds a directory from a [`Metadata`].
 pub fn build_directory_from_metadata(
     path: impl Into<PathBuf>,
     metadata: &Metadata,

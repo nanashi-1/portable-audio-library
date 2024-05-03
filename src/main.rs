@@ -4,6 +4,7 @@ use portable_audio_library::{
     compression,
     error::PortableAudioLibraryResult,
     serialization::Metadata,
+    tempfile,
 };
 
 #[derive(Parser)]
