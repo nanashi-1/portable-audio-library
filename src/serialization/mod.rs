@@ -6,8 +6,9 @@ use serde::{Deserialize, Serialize};
 use std::{
     fs::File,
     io::{Cursor, Read, Seek, Write},
-    path::PathBuf,
+    path::{Path, PathBuf},
 };
+use tempfile::tempfile;
 
 /// Playlist name.
 pub type Playlist = String;
@@ -42,7 +43,7 @@ impl Metadata {
         let path = path.into();
 
         let compression = get_compression(&self.compression_type);
-        let mut compressed_audio_cursors = vec![];
+        let mut compressed_audio_files = vec![];
 
         let progress_bar = indicatif::ProgressBar::new(self.audios.len() as u64);
         progress_bar.set_style(
@@ -55,12 +56,12 @@ impl Metadata {
 
         for audio in &mut self.audios {
             let mut audio_file = std::fs::File::open(&audio.path)?;
-            let mut compressed_audio_cursor = Cursor::new(Vec::new());
+            let mut compressed_audio_file = tempfile()?;
 
-            compression.compress(&mut audio_file, &mut compressed_audio_cursor)?;
+            compression.compress(&mut audio_file, &mut compressed_audio_file)?;
 
-            audio.size = compressed_audio_cursor.get_ref().len() as u64;
-            compressed_audio_cursors.push(compressed_audio_cursor);
+            audio.size = compressed_audio_file.metadata()?.len();
+            compressed_audio_files.push(compressed_audio_file);
 
             progress_bar.inc(1);
         }
@@ -68,7 +69,7 @@ impl Metadata {
         progress_bar.finish_and_clear();
         println!("{} Compression done!", CHECK_GREEN);
 
-        let progress_bar = indicatif::ProgressBar::new(compressed_audio_cursors.len() as u64 + 1);
+        let progress_bar = indicatif::ProgressBar::new(compressed_audio_files.len() as u64 + 1);
         progress_bar.set_style(
             indicatif::ProgressStyle::default_bar()
                 .template(PROGRESS_BAR_TEMPLATE)
@@ -84,8 +85,19 @@ impl Metadata {
         portable_audio_library_file.write_all(&serialized_portable_audio_library)?;
         progress_bar.inc(1);
 
-        for compressed_audio_cursor in compressed_audio_cursors {
-            portable_audio_library_file.write_all(compressed_audio_cursor.get_ref())?;
+        for mut compressed_audio_file in &compressed_audio_files {
+            compressed_audio_file.seek(std::io::SeekFrom::Start(0))?;
+            loop {
+                let mut chunk = vec![0; 16 * 1024 * 1024]; // 16 MB chunk
+                let bytes_read = compressed_audio_file.read(&mut chunk)?;
+
+                if bytes_read == 0 {
+                    break;
+                }
+
+                portable_audio_library_file.write_all(&chunk[..bytes_read])?;
+            }
+
             progress_bar.inc(1);
         }
 
