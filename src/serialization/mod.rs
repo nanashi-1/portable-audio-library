@@ -17,6 +17,7 @@ const U64_SIZE: usize = std::mem::size_of::<u64>();
 const PROGRESS_BAR_TEMPLATE: &str = "{spinner:.green} {msg} [{wide_bar}] {pos}/{len} ({eta})";
 const PROGRESS_CHARS: &str = "=> ";
 const CHECK_GREEN: &str = "\x1b[32m✓\x1b[0m";
+const CHUNK_SIZE: usize = 16 * 1024 * 1024;
 
 /// Metadata of audio library.
 #[derive(Debug, Clone, Default, PartialEq, PartialOrd, Serialize, Deserialize)]
@@ -88,7 +89,7 @@ impl Metadata {
         for mut compressed_audio_file in &compressed_audio_files {
             compressed_audio_file.seek(std::io::SeekFrom::Start(0))?;
             loop {
-                let mut chunk = vec![0; 16 * 1024 * 1024]; // 16 MB chunk
+                let mut chunk = vec![0; CHUNK_SIZE]; // 16 MB chunk
                 let bytes_read = compressed_audio_file.read(&mut chunk)?;
 
                 if bytes_read == 0 {
