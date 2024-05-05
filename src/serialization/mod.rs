@@ -5,8 +5,8 @@ use crate::{
 use serde::{Deserialize, Serialize};
 use std::{
     fs::File,
-    io::{Cursor, Read, Seek, Write},
-    path::{Path, PathBuf},
+    io::{Read, Seek, Write},
+    path::PathBuf,
 };
 use tempfile::tempfile;
 
@@ -139,18 +139,17 @@ impl Metadata {
 
         let mut offset = metadata_size + U64_SIZE as u64;
         for audio_metadata in &mut metadata.audios {
-            let mut buf = vec![0; audio_metadata.size as usize];
             portable_audio_library_file.seek(std::io::SeekFrom::Start(offset))?;
-            portable_audio_library_file.read_exact(&mut buf)?;
+            let mut compressed_audio_file = portable_audio_library_file
+                .try_clone()?
+                .take(audio_metadata.size);
 
             let path = directory_store.join(&audio_metadata.name);
-
             let mut audio_file = File::create(&path)?;
 
-            compression.decompress(&mut Cursor::new(buf), &mut audio_file)?;
+            compression.decompress(&mut compressed_audio_file, &mut audio_file)?;
 
             audio_metadata.path = path;
-
             offset += audio_metadata.size;
 
             progress_bar.inc(1);
